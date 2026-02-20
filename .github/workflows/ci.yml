@@ -1,0 +1,66 @@
+# This is the name of the workflow.
+# It will appear in the GitHub "Actions" tab.
+name: CI
+
+# "on" defines when this workflow should run.
+on:
+
+  # Run the workflow whenever code is pushed
+  push:
+    # Only trigger when pushing to the "main" branch
+    branches: ["main"]
+
+  # Also run the workflow for every Pull Request (PR)
+  # No branch filter here → runs for all PRs
+  pull_request:
+
+
+# "jobs" defines what tasks will be executed
+jobs:
+
+  # This is the name of our job
+  # You can name it anything, here it's called "test-and-lint"
+  test-and-lint:
+
+    # This tells GitHub what kind of virtual machine to use
+    # ubuntu-latest = a Linux VM hosted by GitHub
+    runs-on: ubuntu-latest
+
+    # Steps are executed in order (top → bottom)
+    steps:
+
+      # Step 1: Download your repository code into the VM
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        # "uses" means we are using a pre-built GitHub Action
+        # This action pulls your repo code into the runner
+
+      # Step 2: Install Python inside the VM
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Specify which Python version we want
+          python-version: "3.11"
+
+      # Step 3: Install development dependencies
+      - name: Install dev dependencies
+        run: |
+          # Upgrade pip first (good practice)
+          python -m pip install --upgrade pip
+
+          # Install packages listed in requirements-dev.txt
+          pip install -r requirements-dev.txt
+
+      # Step 4: Run linter (code quality check)
+      - name: Lint (ruff)
+        run: |
+          # Run ruff on the entire project
+          # This checks formatting, unused imports, etc.
+          ruff check .
+
+      # Step 5: Run unit tests. Will check for any files with test_ or _test or inside test folder.
+      # But .toml file tells exactly where the tests are located
+      - name: Run tests (pytest)
+        run: |
+          # -q means quiet mode (cleaner output)
+          pytest -q
