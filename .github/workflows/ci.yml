@@ -25,6 +25,9 @@ jobs:
     # This tells GitHub what kind of virtual machine to use
     # ubuntu-latest = a Linux VM hosted by GitHub
     runs-on: ubuntu-latest
+    
+    env:
+      PYTHONPATH: ${{ github.workspace }}
 
     # Steps are executed in order (top → bottom)
     steps:
